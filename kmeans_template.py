@@ -35,7 +35,7 @@ def update_centroids(data, centroids, assignments):
     """
     # TODO: Update the centroid of each nonempty cluster.
     # TODO: Handle empty clusters using your documented policy.
-    new_centroids = centroids.copy()  # never modify the input in place
+    new_centroids = centroids.astype(float, copy=True) # never modify the input in place
     for j in range(centroids.shape[0]):
         members = data[assignments == j]
         if members.shape[0] > 0:
@@ -43,7 +43,6 @@ def update_centroids(data, centroids, assignments):
         # Empty cluster policy: keep its previous centroid unchanged.
     return new_centroids
     
-    raise NotImplementedError("Implement the centroid step from scratch.")
 
 
 def kmeans(data, centroids, max_iterations=100):

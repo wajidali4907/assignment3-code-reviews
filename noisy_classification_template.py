@@ -63,8 +63,10 @@ def repair_labels_knn(train_features, noisy_labels, neighbors):
     # Ask for neighbors + 1 so we can drop each point itself (distance 0).
     nn = NearestNeighbors(n_neighbors=neighbors + 1).fit(train_features)
     _, idx = nn.kneighbors(train_features)
-    idx = idx[:, 1:]                       # drop self (column 0)
-    # Distance ties: sklearn returns them in index order, used as-is.
+    n = idx.shape[0]
+    mask = idx != np.arange(n)[:, None]   # False where the neighbor is the point itself
+    mask[mask.all(axis=1), -1] = False    # self missing (duplicates): drop the farthest instead
+    idx = idx[mask].reshape(n, neighbors)
 
     votes = noisy_labels[idx].sum(axis=1)  # sum of 5 labels in {-1, +1}
     repaired = np.where(votes > 0, 1, -1)  # majority sign; 5 votes cannot tie
